@@ -33,7 +33,33 @@ def assistant_page():
             selected_site = websites[0]["company_name"]
             st.session_state.selected_site = selected_site
         else:
-            st.warning("No knowledge bases found. Go to **Ingestion** to crawl a website first.")
+            st.markdown("""
+            <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 55vh;
+                text-align: center;
+            ">
+                <div style="
+                    background: white;
+                    border: 1px solid #edf2f7;
+                    border-radius: 16px;
+                    padding: 3rem 2.5rem;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+                    max-width: 420px;
+                ">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">📂</div>
+                    <h3 style="color: #1a2b4b; font-size: 1.2rem; font-weight: 600; margin: 0 0 0.5rem 0;">
+                        No Knowledge Base Found
+                    </h3>
+                    <p style="color: #718096; font-size: 0.92rem; margin: 0 0 1.5rem 0; line-height: 1.6;">
+                        Go to <strong>Data Ingestion</strong> to crawl a website and build your first knowledge base.
+                    </p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             st.stop()
 
     # Session state
@@ -78,15 +104,11 @@ def assistant_page():
             if selected_site:
                 s_col1, s_col2 = st.columns(2)
                 with s_col1:
-                    if st.button("Summarize Website Overview", use_container_width=True):
-                        pending_prompt = f"Can you give me a high-level summary and overview of {selected_site}?"
-                    if st.button("Getting Started & Setup Guide", use_container_width=True):
-                        pending_prompt = f"How do I get started with {selected_site}? What are the setup steps and prerequisites?"
+                    if st.button("📋 Summarize Website", use_container_width=True):
+                        pending_prompt = f"Give me a concise high-level summary and overview of what {selected_site} covers."
                 with s_col2:
-                    if st.button("Architecture & Core Concepts", use_container_width=True):
-                        pending_prompt = f"Explain the core architecture and main components documented in {selected_site}."
-                    if st.button("Frequently Asked Questions", use_container_width=True):
-                        pending_prompt = f"What are the most common use cases, questions, or patterns for {selected_site}?"
+                    if st.button("🧠 Core Concepts", use_container_width=True):
+                        pending_prompt = f"Explain the core architecture and main concepts documented in {selected_site}."
 
     # Chat input
     if not selected_site:
@@ -185,9 +207,9 @@ def assistant_page():
 # Navigation
 # ─────────────────────────────────────────────
 pages = [
-    st.Page(assistant_page,               title="Assistant",  default=True),
-    st.Page("pages/2_Ingestion.py",       title="Ingestion"),
-    st.Page("pages/3_Analytics.py",       title="Analytics"),
+    st.Page(assistant_page,               title="💬 Assistant",  default=True),
+    st.Page("pages/2_Ingestion.py",       title="🌐 Data Ingestion"),
+    st.Page("pages/3_Analytics.py",       title="📊 Analytics"),    
 ]
 
 pg = st.navigation(pages)

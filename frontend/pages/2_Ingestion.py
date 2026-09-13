@@ -40,7 +40,7 @@ with st.container(border=True):
                 with st.spinner("Starting crawler…"):
                     r = requests.post(
                         f"{API_BASE_URL}/crawl",
-                        json={"start_url": site_url, "company_name": kb_name, "max_pages": int(max_pages)},
+                        json={"url": site_url, "company_name": kb_name, "max_pages": int(max_pages)},
                         timeout=15,
                     )
 
@@ -54,9 +54,14 @@ with st.container(border=True):
 
                     for _ in range(200):
                         time.sleep(1.5)
-                        poll = requests.get(f"{API_BASE_URL}/crawl/status/{task_id}", timeout=5)
-                        if poll.status_code != 200:
+                        try:
+                            poll = requests.get(f"{API_BASE_URL}/crawl/status/{task_id}", timeout=5)
+                            if poll.status_code != 200:
+                                continue
+                        except requests.exceptions.RequestException:
+                            # Ignore temporary timeouts during polling
                             continue
+
                         s       = poll.json()
                         status  = s.get("status")
                         crawled = s.get("pages_crawled", 0)

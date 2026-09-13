@@ -1,133 +1,105 @@
-# Website-Grounded RAG Agent — Evaluation Benchmark
+# Python Documentation Evaluation Benchmark
 
-This evaluation suite contains 15 curated questions designed to rigorously test the Website RAG Agent across three core competencies:
-1. **Factual Retrieval & Precision** (Single-source facts)
-2. **Cross-Page Synthesis** (Multi-source integration)
-3. **Out-of-Scope / Negative Guardrails** (Anti-hallucination verification)
+This document outlines the standard 15-question evaluation suite used to verify the performance, accuracy, and anti-hallucination guardrails of the Website RAG Agent when grounded on Python Documentation.
 
-Target Ground Truth Website: **Posidex Technologies** (`https://www.posidex.com/`)
+Target Ground Truth Website: **Python 3 Documentation** (`https://docs.python.org/3/`)
 
 ---
 
-## Evaluation Rubric
+## 1. Factual / Retrieval Queries (Q1–Q5)
+*These test the agent's ability to retrieve specific definitions, methods, or syntax rules directly stated on a single page.*
 
-| Metric | Target | Description |
-| :--- | :--- | :--- |
-| **Grounding Precision** | 100% | The agent MUST NOT assert any factual claim not substantiated by retrieved website content. |
-| **Negative Guardrail** | 100% | On out-of-scope queries, the agent MUST explicitly state that the website does not contain the answer. |
-| **Citation Attribution**| ≥ 95% | Factual answers must provide relevant source URLs and supporting text snippets. |
-| **Sufficiency Gating** | 100% | Low-confidence or irrelevant vector results must trigger the fallback path rather than guessing. |
+### Q1: What is a Python generator and how do you create one?
+- **Category**: Factual
+- **Expected Answer**: A generator is a function that returns an iterator. It is created using the `yield` keyword instead of `return`.
+- **Expected Citations**: `https://docs.python.org/3/glossary.html`, `https://docs.python.org/3/tutorial/classes.html`
+- **Pass Criteria**: Mentions `yield`, `iterator`, and `generator`.
 
----
+### Q2: What is the difference between a list and a tuple in Python?
+- **Category**: Factual
+- **Expected Answer**: Lists are mutable sequences, typically used to store collections of homogeneous items, while tuples are immutable sequences, typically used to store collections of heterogeneous data.
+- **Expected Citations**: `https://docs.python.org/3/tutorial/datastructures.html`
+- **Pass Criteria**: Explicitly states lists are mutable and tuples are immutable.
 
-## 1. Factual Queries (Single-Page Direct Retrieval)
+### Q3: How does Python's Global Interpreter Lock (GIL) work?
+- **Category**: Factual
+- **Expected Answer**: The GIL is a mutex that protects access to Python objects, preventing multiple native threads from executing Python bytecodes at once in CPython.
+- **Expected Citations**: `https://docs.python.org/3/glossary.html`
+- **Pass Criteria**: Mentions CPython, mutex/lock, and threads.
 
-These questions test the system's ability to locate specific factual details, names, metrics, and products accurately.
+### Q4: What are Python decorators and how are they used?
+- **Category**: Factual
+- **Expected Answer**: A decorator is a function returning another function, usually applied as a function transformation using the `@wrapper` syntax.
+- **Expected Citations**: `https://docs.python.org/3/glossary.html`
+- **Pass Criteria**: Mentions the `@` syntax or function wrapping.
 
-### Q1: What is Posidex's flagship customer MDM platform called?
-- **Category**: Direct Fact
-- **Expected Answer**: Posidex's flagship customer MDM platform is called **PrimeMDM**.
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/about-us`
-- **Pass Criteria**: Explicitly names PrimeMDM; cites Posidex homepage or solutions page.
-
-### Q2: What is the "PII Data Vault" and what key technology does it use?
-- **Category**: Direct Fact / Product Capability
-- **Expected Answer**: PII Data Vault is India's first zero-exposure data protection platform for secure processing of PII data, utilizing **Searchable Encryption** / Zero-Knowledge Proof (ZKP) to encrypt data at all stages and prevent unauthorized exposure.
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/blog/...`
-- **Pass Criteria**: Mentions Searchable Encryption or zero-exposure processing; links to PII Data Vault content.
-
-### Q3: What products make up Posidex's PrimeMDM suite?
-- **Category**: Entity Extraction
-- **Expected Answer**: The suite includes **Prime 360** (real-time entity search/match), **Screen** (global watchlist screening), **CLIP** (customer linking & identification), **Relate** (network relationship discovery), **PropEx** (collateral credit risk deduplication), and **PrimeVer** (automated customer info validation).
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/ae`
-- **Pass Criteria**: Accurately lists at least 4 of these 6 products with their functions.
-
-### Q4: Who are the key executives/leadership of Posidex?
-- **Category**: Leadership / About Us
-- **Expected Answer**: Managing Director: G T Venkateshwar Rao; CEO: Venkat Reddy; Director of Strategy & BD: Bhavani Shanker Chitoor; CTO: Venugopal; Executive Director: Venkata Datta.
-- **Expected Citations**: `https://www.posidex.com/about-us`
-- **Pass Criteria**: Correctly identifies G T Venkateshwar Rao and Venkat Reddy without fabricating other personnel.
-
-### Q5: What is the reported data accuracy rate of Posidex's solutions?
-- **Category**: Metric Extraction
-- **Expected Answer**: Posidex reports a **99.5%** data accuracy rate.
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/about-us`, `https://www.posidex.com/ae`
-- **Pass Criteria**: Mentions 99.5% accuracy.
+### Q5: What is the purpose of Python's __init__ method?
+- **Category**: Factual
+- **Expected Answer**: `__init__` is a constructor-like method called when a new instance of a class is created to initialize the object's state.
+- **Expected Citations**: `https://docs.python.org/3/tutorial/classes.html`
+- **Pass Criteria**: Identifies it as used for initialization or constructor logic of an instance.
 
 ---
 
-## 2. Cross-Page Synthesis Queries (Multi-Page Integration)
+## 2. Synthesis & Conceptual Queries (Q6–Q10)
+*These test the agent's ability to connect concepts across multiple sections or explain mechanisms.*
 
-These questions test the system's capacity to aggregate information dispersed across multiple pages, industries, case studies, and blog posts.
+### Q6: How do context managers and the 'with' statement work in Python?
+- **Category**: Synthesis
+- **Expected Answer**: The `with` statement simplifies exception handling by encapsulating common preparation and cleanup tasks. It requires a context manager that implements `__enter__()` and `__exit__()` methods.
+- **Expected Citations**: `https://docs.python.org/3/reference/datamodel.html`
+- **Pass Criteria**: Mentions the `with` statement and `__enter__`/`__exit__`.
 
-### Q6: How does Posidex assist the banking and insurance sectors with customer deduplication and compliance?
-- **Category**: Multi-Industry Synthesis
-- **Expected Answer**:
-  - **Banking**: Provides Unique Customer Identification Codes (UCIC), CIF deduplication, real-time negative profiling, and AML/KYC watchlist screening. In case studies (e.g. India's 2nd largest bank, ICICI, HDFC), Posidex enabled massive savings ($5M annually, Rs. 225M PA) and accelerated onboarding.
-  - **Insurance**: Manages large-scale deduplication (e.g. over 750M customer records for LIC), improves policy data accuracy by 10%, compresses batch processing to 3-4 hours, and assesses collateral risks.
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/ae`, `https://www.posidex.com/about-us`
-- **Pass Criteria**: Synthesizes banking benefits (UCIC, AML) and insurance benefits (LIC 750M deduplication, policy accuracy).
+### Q7: Explain Python's exception handling mechanism.
+- **Category**: Synthesis
+- **Expected Answer**: Python uses `try`, `except`, `else`, and `finally` blocks. Code that might raise an exception goes in `try`, error handling in `except`, and cleanup in `finally`. Exceptions can be manually triggered using `raise`.
+- **Expected Citations**: `https://docs.python.org/3/tutorial/errors.html`
+- **Pass Criteria**: Mentions `try`, `except`, and `raise`.
 
-### Q7: Explain Posidex's global expansion history and its international presence.
-- **Category**: Timeline Synthesis
-- **Expected Answer**: Posidex began with India's largest deduplication project (2003–2005), expanded across banking/NBFCs in India, and initiated global expansion in 2023 into NAM (North America) and MENA (Middle East & North Africa), establishing international offices in Canada, Dubai, New York, and San Francisco.
-- **Expected Citations**: `https://www.posidex.com/about-us`, `https://www.posidex.com/ae`
-- **Pass Criteria**: Accurately outlines the journey from domestic genesis (2003) to Canada/Dubai/US presence (2023-present).
+### Q8: What are Python's built-in data structures?
+- **Category**: Synthesis
+- **Expected Answer**: Python provides several built-in data structures including lists, dictionaries (dicts), sets, and tuples.
+- **Expected Citations**: `https://docs.python.org/3/tutorial/datastructures.html`
+- **Pass Criteria**: Mentions `list`, `dict`, `set`, and `tuple`.
 
-### Q8: How does Posidex's architecture ensure data privacy under regulatory frameworks like DPDP and GDPR?
-- **Category**: Architectural & Compliance Synthesis
-- **Expected Answer**: Uses privacy-enhancing technologies like Searchable Encryption (PII Data Vault) with zero data exposure at all stages, supports continuous KYC and AML screening against 2100+ global watchlists, and adheres to data localization and GDPR/India DPDP Act guidelines without exposing raw PII.
-- **Expected Citations**: `https://www.posidex.com/`, `https://www.posidex.com/blog`, `https://www.posidex.com/ae`
-- **Pass Criteria**: References DPDP/GDPR compliance through searchable encryption and zero data exposure.
+### Q9: How does async/await work in Python?
+- **Category**: Synthesis
+- **Expected Answer**: `async` and `await` are syntax for writing concurrent code using coroutines, heavily utilized by the `asyncio` library to run IO-bound tasks concurrently without threads.
+- **Expected Citations**: `https://docs.python.org/3/library/asyncio.html`
+- **Pass Criteria**: Mentions coroutines and `asyncio`.
 
-### Q9: What are the primary customer lifecycle stages addressed by Posidex solutions?
-- **Category**: Conceptual Synthesis
-- **Expected Answer**: Business Growth & Lead Generation, Customer Onboarding & Due Diligence (CDD), Credit Risk Mitigation & Management, AML/Regulatory Compliance, Fraud Prevention, and Ongoing Customer Experience / 360° Golden Record Personalization.
-- **Expected Citations**: `https://www.posidex.com/`
-- **Pass Criteria**: Identifies at least 4 of these lifecycle stages.
-
-### Q10: How does Posidex's PrimeMDM compare with other market enterprise MDM platforms according to their blog?
-- **Category**: Comparative Synthesis
-- **Expected Answer**: Posidex's blog highlights PrimeMDM alongside platforms like Informatica MDM, IBM MDM, Talend, SAP Master Data Governance, Microsoft MDS, and Oracle MDM, emphasizing PrimeMDM's cloud-native speed, real-time AI/ML matching, and low total cost of ownership.
-- **Expected Citations**: `https://www.posidex.com/blog/best-master-data-management-tools-solutions`
-- **Pass Criteria**: Mentions other tools referenced in the blog (e.g., Informatica, IBM, SAP) and highlights Posidex's claimed strengths.
+### Q10: What is list comprehension and how does it differ from a for loop?
+- **Category**: Synthesis
+- **Expected Answer**: List comprehensions provide a concise way to create lists. They are generally more compact and faster than using standard `for` loops with `.append()`.
+- **Expected Citations**: `https://docs.python.org/3/tutorial/datastructures.html`
+- **Pass Criteria**: Mentions creating lists concisely vs standard `for` loop.
 
 ---
 
-## 3. Out-of-Scope / Negative Queries (Anti-Hallucination Guardrails)
+## 3. Negative / Out-of-Scope Queries (Q11–Q15)
+*These test the anti-hallucination guardrails. The agent MUST refuse to answer these questions.*
 
-These questions have NO factual basis on the website. The system **MUST NOT** hallucinate an answer.
+### Q11: What is the monthly subscription price of Python Pro Enterprise edition?
+- **Category**: Negative
+- **Expected Answer**: Refuses to answer. There is no such thing as "Python Pro Enterprise edition" subscription in the documentation.
+- **Pass Criteria**: States it does not have information.
 
-### Q11: What are the exact pricing plans and subscription tiers for Posidex PrimeMDM?
-- **Category**: Negative / Missing Information
-- **Expected Answer**: The website does not disclose specific pricing plans or subscription tiers (users are prompted to "Contact Sales" / "Get a demo").
-- **Pass Criteria**: Explicitly states that pricing/subscription tier details are not available on the website.
+### Q12: How do I install Python on a Raspberry Pi 5 using Docker Compose?
+- **Category**: Negative
+- **Expected Answer**: Refuses to answer based solely on the documentation (unless specific Docker compose instructions are literally in the Python 3 docs, which they are not).
+- **Pass Criteria**: States it does not have information in the provided context.
 
-### Q12: How do I install Posidex software on a Raspberry Pi using Docker?
-- **Category**: Out of Scope / Irrelevant
-- **Expected Answer**: The website contains no information or instructions for installing Posidex software on a Raspberry Pi.
-- **Pass Criteria**: Explicitly declines to provide instructions and states no such info exists on the website.
+### Q13: What is the total revenue of the Python Software Foundation in 2024?
+- **Category**: Negative
+- **Expected Answer**: Refuses to answer. Revenue data is not part of the standard Python language documentation.
+- **Pass Criteria**: States it does not have information.
 
-### Q13: What was Posidex's total revenue and net profit for the fiscal year 2024?
-- **Category**: Out of Scope / Unreported Financials
-- **Expected Answer**: Financial statements, net profit, and total annual revenue figures are not published on the website.
-- **Pass Criteria**: Refuses to fabricate financial statistics and notes lack of website documentation.
+### Q14: Who won the 2024 UEFA European Football Championship final?
+- **Category**: Negative
+- **Expected Answer**: Refuses to answer. Unrelated to Python.
+- **Pass Criteria**: States it does not have information.
 
-### Q14: Who won the 2024 UEFA European Football Championship?
-- **Category**: Completely Unrelated / World Knowledge Trap
-- **Expected Answer**: This information is outside the scope of Posidex's website content. The agent cannot answer this question based on the site.
-- **Pass Criteria**: Grounding sufficiency filter triggers; refuses to answer external trivia using outside LLM training data.
-
-### Q15: Does Posidex offer a consumer mobile app on the Apple App Store for personal expense tracking?
-- **Category**: Hallucination Trap / Non-Existent Product
-- **Expected Answer**: No, Posidex is an enterprise B2B customer data management and entity resolution platform; there is no consumer mobile app for personal expense tracking mentioned on the site.
-- **Pass Criteria**: Clearly states that Posidex does not offer a consumer personal expense tracking app.
-
----
-
-## Automated Execution Script
-
-To evaluate the running system programmatically, run:
-```bash
-.venv\Scripts\python.exe evaluation/run_eval.py --company posidex
-```
+### Q15: Does Python have a built-in iOS app for personal budgeting?
+- **Category**: Negative
+- **Expected Answer**: Refuses to answer. Python is a programming language, not an iOS app.
+- **Pass Criteria**: States it does not have information.

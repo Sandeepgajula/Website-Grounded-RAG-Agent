@@ -96,7 +96,7 @@ Website_Rag_Assistant/
 │       ├── 2_RAG_Assistant.py   # Grounded Chat with Citations & Streaming
 │       └── 3_Token_Analytics.py # Interactive Observability Dashboard
 ├── data/
-│   ├── posidex.json             # Pre-cleaned 118-page dataset for Posidex
+│   ├── python_docs.json         # Pre-cleaned dataset for Python Docs
 │   └── token_log.jsonl          # Continuous audit log of token usage & latency
 ├── chroma_db/                   # Persistent ChromaDB vector collections
 ├── evaluation/
@@ -163,13 +163,13 @@ Open two terminal windows:
 
 ### 1. Ingesting Data (Instant or Crawl)
 1. Go to **Data Ingestion** in the sidebar.
-2. **Instant Ingestion**: A pre-crawled 118-page dataset for **Posidex** (`data/posidex.json`) is included. Select the "Ingest to Vector DB" tab and click **Ingest into Vector Store**.
-3. **New Crawl**: Under the "Crawl Website" tab, enter any public URL (e.g. `https://example.com/`), name the company, and click **Start Async Crawl**. The system will crawl internal pages, clean noise, and save a structured JSON.
+2. **Instant Ingestion**: A pre-crawled dataset for **Python Docs** (`data/python_docs.json`) is included. Select the "Ingest to Vector DB" tab and click **Ingest into Vector Store**.
+3. **New Crawl**: Under the "Crawl Website" tab, enter any public URL (e.g. `https://docs.python.org/3/`), name the company, and click **Start Async Crawl**. The system will crawl internal pages, clean noise, and save a structured JSON.
 
 ### 2. Asking Questions (Grounded RAG)
 1. Go to **RAG Assistant**.
 2. Select the ingested website from the dropdown.
-3. Ask factual questions (e.g. *"What is PrimeMDM?"* or *"What is PII Data Vault?"*).
+3. Ask factual questions (e.g. *"What is a Python generator?"* or *"How does the GIL work?"*).
 4. Inspect the answer, expandable **Source Citations** with live URLs, and token usage metadata.
 5. Test anti-hallucination by asking out-of-scope questions (e.g. *"Who won the UEFA Championship?"*); the agent will politely decline to answer.
 
@@ -186,7 +186,7 @@ Open two terminal windows:
 Run the 15-question benchmark to verify factual accuracy and anti-hallucination guardrails:
 
 ```bash
-.venv\Scripts\python.exe evaluation/run_eval.py --company posidex
+.venv\Scripts\python.exe evaluation/run_eval.py --company python_docs
 ```
 
 The benchmark tests:

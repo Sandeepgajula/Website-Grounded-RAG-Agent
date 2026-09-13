@@ -85,27 +85,27 @@ def _log_token_usage(
 # ─────────────────────────────────────────────
 # PROMPTS
 # ─────────────────────────────────────────────
-_SYSTEM_PROMPT = """You are a precise, helpful assistant that answers questions ONLY using the provided website content.
+_SYSTEM_PROMPT = """You are a precise, grounded assistant that answers questions STRICTLY using the provided website content.
 
-STRICT RULES:
-1. Answer ONLY from the provided [CONTEXT]. Do not use outside knowledge.
-2. If the context doesn't contain enough information, say so clearly.
-3. Always cite sources by referencing the page title or URL from the context.
-4. Be concise and structured. Use bullet points or numbered lists when appropriate.
-5. Never fabricate facts, URLs, or product names.
-6. If a question is misleading or contains false premises, correct it politely.
+RULES (follow exactly):
+1. Answer ONLY from the [CONTEXT] below. Never use outside knowledge or training data.
+2. If the context does not contain enough information, respond ONLY with:
+   "I don't have enough information from the website to answer this question accurately."
+3. Keep answers concise and well-structured. Use bullet points or numbered steps when helpful.
+4. At the end, list ONLY the sources you directly referenced — never list sources you did not use.
+5. Never fabricate facts, URLs, product names, or prices.
+6. If the question contains a false premise, politely correct it using only context evidence.
 
-Format your response as:
-[Your answer here]
+Response format:
+[Your grounded answer]
 
 **Sources:**
-- [Page Title] — [URL]
-(List only sources you actually used)"""
+- [Page Title] — [URL]"""
 
 _NOT_ENOUGH_INFO_RESPONSE = (
     "I don't have enough information from the website to answer this question accurately. "
-    "The available content doesn't cover this topic. "
-    "Please visit the website directly or refine your question."
+    "The retrieved content doesn't cover this topic. "
+    "Please visit the website directly or try rephrasing your question."
 )
 
 
@@ -114,6 +114,7 @@ _NOT_ENOUGH_INFO_RESPONSE = (
 # ─────────────────────────────────────────────
 class RagState(TypedDict):
     query: str
+    rewritten_query: str          # query after rewriting for better retrieval
     company_name: str
     history: List[Dict[str, str]]
     top_k: int
@@ -131,11 +132,46 @@ class RagState(TypedDict):
 # ─────────────────────────────────────────────
 # GRAPH NODES
 # ─────────────────────────────────────────────
+def _node_rewrite_query(state: RagState) -> RagState:
+    """
+    Node 0: Rewrite the user query into a clean, retrieval-optimised search phrase.
+    This strips conversational filler and expands abbreviations, boosting recall.
+    """
+    query = state["query"]
+    history = state.get("history") or []
+
+    # Build a minimal rewriting prompt
+    rewrite_prompt = (
+        "Rewrite the following user question as a short, clear, keyword-rich search query "
+        "suitable for a vector similarity search. Remove filler words. Keep it under 20 words. "
+        "Return ONLY the rewritten query, nothing else.\n\n"
+        f"Question: {query}\nRewritten:"
+    )
+
+    base_url, model_name, api_key = get_llm_config()
+    llm = ChatOpenAI(
+        base_url=base_url,
+        api_key=api_key,
+        model=model_name,
+        temperature=0,
+        max_tokens=60,
+    )
+    try:
+        result = llm.invoke([HumanMessage(content=rewrite_prompt)])
+        rewritten = result.content.strip().strip('"').strip("'") or query
+    except Exception:
+        rewritten = query  # fall back to original on error
+
+    state["rewritten_query"] = rewritten
+    return state
+
+
 def _node_retrieve(state: RagState) -> RagState:
-    """Node 1: Retrieve relevant chunks from ChromaDB."""
+    """Node 1: Retrieve relevant chunks from ChromaDB using the rewritten query."""
+    search_query = state.get("rewritten_query") or state["query"]
     chunks = similarity_search(
         company_name=state["company_name"],
-        query=state["query"],
+        query=search_query,
         top_k=state["top_k"],
     )
 
@@ -250,11 +286,13 @@ def _node_generate(state: RagState) -> RagState:
 def _build_rag_graph():
     graph = StateGraph(RagState)
 
+    graph.add_node("rewrite", _node_rewrite_query)
     graph.add_node("retrieve", _node_retrieve)
     graph.add_node("generate_no_info", _node_generate_no_info)
     graph.add_node("generate", _node_generate)
 
-    graph.set_entry_point("retrieve")
+    graph.set_entry_point("rewrite")
+    graph.add_edge("rewrite", "retrieve")
     graph.add_conditional_edges(
         "retrieve",
         _node_check_sufficiency,
@@ -287,6 +325,7 @@ def run_rag(
     """
     initial_state: RagState = {
         "query": query,
+        "rewritten_query": "",
         "company_name": company_name,
         "history": history or [],
         "top_k": top_k,
