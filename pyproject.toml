@@ -1,0 +1,35 @@
+[project]
+name = "website-rag-assistant"
+version = "2.0.0"
+description = "Website-Grounded RAG Agent: crawl any website, build a knowledge base, and answer questions with citations."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+    # Config
+    "python-dotenv>=1.0.0",
+    # Vector store (includes default embedding model)
+    "chromadb>=0.5.0",
+    # LLM / RAG framework
+    "langchain>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langchain-community>=0.3.0",
+    "langgraph>=0.2.0",
+    "langchain-text-splitters>=0.3.0",
+    # Token counting
+    "tiktoken>=0.7.0",
+    # Web crawler
+    "httpx>=0.27.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    # Text cleaning
+    "ftfy>=6.2.0",
+    # Frontend
+    "streamlit>=1.40.0",
+    "plotly>=5.24.0",
+    # Utilities
+    "pydantic>=2.8.0",
+]
