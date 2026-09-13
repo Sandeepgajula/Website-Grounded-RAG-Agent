@@ -1,0 +1,21 @@
+# ── LLM (OpenAI-compatible endpoint) 
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL_NAME=openai/gpt-oss-20b
+LLM_API_KEY=
+
+# ── Storage Paths 
+DATA_DIR=./data
+CHROMA_PERSIST_DIR=./chroma_db
+
+# ── Crawler Settings 
+MAX_CRAWL_PAGES=100
+CRAWL_DELAY_SECONDS=0.5
+CRAWL_TIMEOUT_SECONDS=15
+
+# ── Chunking Settings 
+CHUNK_SIZE=1000
+CHUNK_OVERLAP=150
+
+# ── RAG Settings 
+RAG_TOP_K=6
+RAG_MIN_RELEVANCE_SCORE=0.30
