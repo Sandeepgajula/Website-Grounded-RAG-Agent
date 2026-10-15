@@ -52,10 +52,10 @@ flowchart TB
     end
 
     subgraph RAG ["2. GROUNDED RAG WORKFLOW (LangGraph)"]
-        UserQ[User Question] --> RetrieveNode[Node: Retrieve<br/>ChromaDB Vector Search]
+        UserQ[User Question] --> RetrieveNode[Retrieve<br/>ChromaDB Vector Search]
         RetrieveNode --> Gating{Relevance &<br/>Sufficiency Gating}
-        Gating -- Below Threshold --> FallbackNode[Node: No Info<br/>Refuse Hallucination]
-        Gating -- Sufficient --> GenNode[Node: Grounded Generation<br/>Strict System Prompt]
+        Gating -- Below Threshold --> FallbackNode[No Info<br/>Refuse Hallucination]
+        Gating -- Sufficient --> GenNode[Grounded Generation<br/>Strict System Prompt]
         GenNode --> Citations[Extract Citations<br/>Source URLs + Snippets]
     end
 
